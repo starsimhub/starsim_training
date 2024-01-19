@@ -1,2 +1,3 @@
-# abm_training_course
-Placeholder for ABM training course materials
+# ABM training course
+
+Placeholder for APHRC ABM training course materials.
