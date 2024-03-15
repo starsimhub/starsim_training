@@ -27,3 +27,4 @@ class Antsim:
 sim = Antsim()
 sim.makeants(numants=100)
 sim.plotants()
+print("Run successful!")
