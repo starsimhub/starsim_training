@@ -1,6 +1,6 @@
-'''
+"""
 Simple agent-based SIR model in Python
-'''
+"""
 
 import numpy as np
 import pylab as pl
@@ -15,18 +15,9 @@ maxtime = 10 # How long to simulate for
 npts = 100 # Number of time points during the simulation
 dt = maxtime/npts # Timestep length
 
-# Create the arrays -- one entry per timestep
-x = np.arange(npts)
-S = np.zeros(npts)
-I = np.zeros(npts)
-R = np.zeros(npts)
-time = x*dt
-S[0] = N - I0 # Set initial conditions
-I[0] = I0
 
-
-# Define each person
 class Person:
+    """ Define each agent in the model """
 
     def __init__(self):
         self.S = True # People start off susceptible
@@ -41,68 +32,77 @@ class Person:
         self.I = False
         self.R = True
 
-    def check_infect(self, other):
+    def check_infection(self, other):
         if self.S: # A person must be susceptible to be infected
             if other.I: # The other person must be infectious
-                if np.random.rand() < beta/N*dt: # Infection is probabilistic
+                if np.random.rand() < beta/(N*contact_rate)*dt: # Infection is probabilistic
                     self.infect()
-        return
 
     def check_recovery(self):
         if self.I: # A person must be infected to recover
             if np.random.rand() < gamma*dt: # Recovery is also probabilistic
                 self.recover()
-        return
 
 
-# Define the population
-class Population:
-
+class Sim:
+    """ Define the simulation """
+    
     def __init__(self):
+        # Create the arrays -- one entry per timestep
+        self.x = np.arange(npts)
+        self.S = np.zeros(npts)
+        self.I = np.zeros(npts)
+        self.R = np.zeros(npts)
+        self.time = self.x*dt # Create the time vector
+        self.S[0] = N - I0 # Set initial conditions
+        self.I[0] = I0
+        
         self.people = [Person() for i in range(N)] # Create all the people
         for person in self.people[0:I0]: # Make the first I0 people infectious
             person.infect() # Set the initial conditions
 
-    def count_S(self): # Count how many people are susceptible
-        return sum([person.S for person in self.people])
+    def count(self):
+        S = sum([person.S for person in self.people])
+        I = sum([person.I for person in self.people])
+        R = sum([person.R for person in self.people])
+        return S, I, R
 
-    def count_I(self):
-        return sum([person.I for person in self.people])
-
-    def count_R(self):
-        return sum([person.R for person in self.people])
-
-    def check_infections(self): # Check which infectious occur
+    def check_infections(self):
         for person1 in self.people:
             contacts = np.random.randint(0, N, int(N*contact_rate))
             for contact in contacts:
                 person2 = self.people[contact]
-                person1.check_infect(person2)
+                person1.check_infection(person2)
 
-    def check_recoveries(self): # Check which recoveries occur
+    def check_recoveries(self):
         for person in self.people:
             person.check_recovery()
+    
+    def run(self):
+        for t in self.x[:-1]:
+            # Update the agents
+            self.check_infections() # Check which infectious occur
+            self.check_recoveries() # Check which recoveries occur
+            
+            # Collect results
+            S, I, R = self.count()
+            self.S[t+1] = S
+            self.I[t+1] = I
+            self.R[t+1] = R
+            
+        print('Run finished')
+    
+    def plot(self):
+        pl.plot(self.time, self.S, label='Susceptible')
+        pl.plot(self.time, self.I, label='Infectious')
+        pl.plot(self.time, self.R, label='Recovered')
+        pl.legend()
+        pl.xlabel('Time')
+        pl.ylabel('Number of people')
+        pl.show()
 
 
-# Create the population
-pop = Population()
-
-# Run the simulation
-for t in x[:-1]:
-
-    pop.check_infections() # Check which infectious occur
-    pop.check_recoveries() # Check which recoveries occur
-
-    S[t+1] = pop.count_S() # Count the current number of susceptible people
-    I[t+1] = pop.count_I()
-    R[t+1] = pop.count_R()
-
-
-# Plot
-pl.plot(time, S, label='Susceptible')
-pl.plot(time, I, label='Infectious')
-pl.plot(time, R, label='Recovered')
-pl.legend()
-pl.xlabel('Time')
-pl.ylabel('Number of people')
-pl.show()
+if __name__ == '__main__':
+    sim = Sim()
+    sim.run()
+    sim.plot()
