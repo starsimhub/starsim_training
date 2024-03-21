@@ -8,9 +8,9 @@ sc.options(dpi=200)
 class Antsim:
     ''' Simulation of ants randomly walking '''
 
-    def makeants(self, numants=50):
+    def makeants(self, num_ants=50):
         ''' Initialize the ants '''
-        self.numants = numants
+        self.num_ants = num_ants
         self.x = np.random.uniform(-1,1,100)
         self.y = np.random.uniform(-1,1,100)
 
@@ -19,8 +19,11 @@ class Antsim:
         pl.figure()
         for t in range(timesteps):
             pl.clf()
-            self.x += stepsize * pl.randn(self.numants)
-            self.y += stepsize * pl.randn(self.numants)
+            self.x += stepsize * pl.randn(self.num_ants)
+            self.y += stepsize * pl.randn(self.num_ants)
+            # Keep ants within bounds
+            self.x = pl.clip(self.x, -1, 1)
+            self.y = pl.clip(self.y, -1, 1)
             pl.scatter(self.x, self.y)
             pl.xlim((-1, 1))
             pl.ylim((-1, 1))
@@ -30,5 +33,5 @@ class Antsim:
 
 # Run the simulation
 sim = Antsim()
-sim.makeants(numants=100)
+sim.makeants(num_ants=100)
 sim.plotants()

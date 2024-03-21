@@ -1,11 +1,3 @@
-
-"""
-EXERCISE 3:
-Now, we want to calculate the attraction of each ant toward each food source. Write a function that makes this calculation,
-the attraction levels being proportional to 1/distance (to each food source). You may use the 'calculate_attraction'
-function we started for you below.
-"""
-
 import pylab as pl
 import sciris as sc
 import numpy as np
@@ -29,6 +21,7 @@ class Antsim:
 
     def calculate_attraction(self):
         ''' Calculate each ant's attraction toward each food source '''
+
         # Initialize attraction arrays
         self.attraction_x = np.zeros((self.num_ants, self.num_food_sources))
         self.attraction_y = np.zeros((self.num_ants, self.num_food_sources))
@@ -36,18 +29,24 @@ class Antsim:
         # Calculate attraction towards each food source
         for i in range(self.num_ants):
             for j in range(self.num_food_sources):
+                # Calculate distance between ant and food source
+                direction_x = self.x_food[j] - self.x[i]
+                direction_y = self.y_food[j] - self.y[i]
+                distance_to_food = np.sqrt(direction_x ** 2 + direction_y ** 2)
+
                 # Update attraction arrays (proportional to 1/distance)
+                if distance_to_food != 0:
+                    self.attraction_x[i, j] = direction_x / distance_to_food
+                    self.attraction_y[i, j] = direction_y / distance_to_food
 
     def plotants(self, timesteps=150, stepsize=0.03):
         ''' Plot the ants '''
         pl.figure()
         for t in range(timesteps):
             pl.clf()
-            self.x += stepsize * pl.randn(self.num_ants)
-            self.y += stepsize * pl.randn(self.num_ants)
-            # Keep ants within bounds
-            self.x = pl.clip(self.x, -1, 1)
-            self.y = pl.clip(self.y, -1, 1)
+            self.calculate_attraction()
+            self.update_ant_positions(stepsize)
+
             # Plot the ants and food sources
             pl.scatter(self.x, self.y)
             pl.scatter(self.x_food, self.y_food, color='green', marker='x')
@@ -55,6 +54,23 @@ class Antsim:
             pl.ylim((-1, 1))
             pl.title('t = %i / %i' % (t + 1, timesteps))
             pl.pause(1e-3)
+
+    def update_ant_positions(self, stepsize):
+        ''' Update ant positions based on random walk and attraction towards food sources '''
+
+        # Move ants randomly
+        self.x += stepsize * pl.randn(self.num_ants)
+        self.y += stepsize * pl.randn(self.num_ants)
+
+        # Add small additional movement towards food based on attraction
+        for i in range(self.num_ants):
+            for j in range(self.num_food_sources):
+                self.x[i] += stepsize * 0.1 * self.attraction_x[i, j]
+                self.y[i] += stepsize * 0.1 * self.attraction_y[i, j]
+
+        # Keep ants within bounds
+        self.x = pl.clip(self.x, -1, 1)
+        self.y = pl.clip(self.y, -1, 1)
 
 
 # Run the simulation

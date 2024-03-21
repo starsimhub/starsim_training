@@ -8,23 +8,47 @@ sc.options(dpi=200)
 class Antsim:
     ''' Simulation of ants randomly walking '''
 
-    def makeants(self, numants=50, num_food_sources=2):
-        ''' Initialize the ants '''
-        self.numants = numants
-        self.num_food_sources = num_food_sources
+    def makeants(self, num_ants=50, num_food_sources=3):
+        ''' Initialize the ants and food sources'''
+        self.num_ants = num_ants
         self.x = np.random.uniform(-1,1,100)
         self.y = np.random.uniform(-1,1,100)
 
         ''' Initialize food sources '''
+        self.num_food_sources = num_food_sources
         self.x_food = np.random.uniform(-1, 1, num_food_sources)
         self.y_food = np.random.uniform(-1, 1, num_food_sources)
+
+    def calculate_attraction(self):
+        ''' Calculate each ant's attraction toward each food source '''
+        # Initialize attraction arrays
+        self.attraction_x = np.zeros((self.num_ants, self.num_food_sources))
+        self.attraction_y = np.zeros((self.num_ants, self.num_food_sources))
+
+        # Calculate attraction towards each food source
+        for i in range(self.num_ants):
+            for j in range(self.num_food_sources):
+                # Calculate distance between ant and food source
+                direction_x = self.x_food[j] - self.x[i]
+                direction_y = self.y_food[j] - self.y[i]
+                distance_to_food = np.sqrt(direction_x ** 2 + direction_y ** 2)
+
+                # Update attraction arrays (proportional to 1/distance)
+                if distance_to_food != 0:
+                    self.attraction_x[i, j] = direction_x / distance_to_food
+                    self.attraction_y[i, j] = direction_y / distance_to_food
 
     def plotants(self, timesteps=150, stepsize=0.03):
         ''' Plot the ants '''
         pl.figure()
         for t in range(timesteps):
             pl.clf()
-            self.update_ant_positions(stepsize)
+            self.x += stepsize * pl.randn(self.num_ants)
+            self.y += stepsize * pl.randn(self.num_ants)
+            # Keep ants within bounds
+            self.x = pl.clip(self.x, -1, 1)
+            self.y = pl.clip(self.y, -1, 1)
+            # Plot the ants and food sources
             pl.scatter(self.x, self.y)
             pl.scatter(self.x_food, self.y_food, color='green', marker='x')
             pl.xlim((-1, 1))
@@ -32,35 +56,8 @@ class Antsim:
             pl.title('t = %i / %i' % (t + 1, timesteps))
             pl.pause(1e-3)
 
-    def update_ant_positions(self, stepsize):
-        ''' Update ant positions based on random walk and attraction towards food sources '''
-
-        # Determine which food source the ant is closest to
-        for i in range(self.numants):
-            min_distance_to_food = float('inf')
-            closest_food_source = None
-            for j in range(self.num_food_sources):
-                distance_to_food = np.sqrt((self.x[i] - self.x_food[j]) ** 2 + (self.y[i] - self.y_food[j]) ** 2)
-                if distance_to_food < min_distance_to_food:
-                    min_distance_to_food = distance_to_food
-                    closest_food_source = j
-            # Move ant towards the closest food source
-            if closest_food_source is not None:
-                # Calculate the direction towards the food source
-                direction_x = self.x_food[closest_food_source] - self.x[i]
-                direction_y = self.y_food[closest_food_source] - self.y[i]
-
-                # Normalize the direction vector
-                direction_norm = np.sqrt(direction_x ** 2 + direction_y ** 2)
-                direction_x /= direction_norm
-                direction_y /= direction_norm
-
-                # Update the ant's position towards the food source
-                self.x[i] += stepsize * direction_x
-                self.y[i] += stepsize * direction_y
-
 
 # Run the simulation
 sim = Antsim()
-sim.makeants(numants=100, num_food_sources=2)
+sim.makeants(num_ants=100, num_food_sources=3)
 sim.plotants()

@@ -12,20 +12,20 @@ Make sure these colors are shown on the ‘ants’ in the plot(s).
 class Antsim:
     ''' Simulation of ants randomly walking '''
 
-    def makeants(self, numants=50):
+    def makeants(self, num_ants=50):
         ''' Initialize the ants '''
-        self.numants = numants
-        self.x = pl.zeros(numants)
-        self.y = pl.zeros(numants)
-        self.colors = ['red' if i < numants/2 else 'black' for i in range(numants)]
+        self.num_ants = num_ants
+        self.x = pl.zeros(num_ants)
+        self.y = pl.zeros(num_ants)
+        self.colors = ['red' if i < num_ants/2 else 'black' for i in range(num_ants)]
 
     def plotants(self, timesteps=150, stepsize=0.03):
         ''' Plot the ants '''
         pl.figure()
         for t in range(timesteps):
             pl.clf()
-            self.x += stepsize * pl.randn(self.numants)
-            self.y += stepsize * pl.randn(self.numants)
+            self.x += stepsize * pl.randn(self.num_ants)
+            self.y += stepsize * pl.randn(self.num_ants)
             pl.scatter(self.x, self.y, color=self.colors)
             pl.xlim((-1, 1))
             pl.ylim((-1, 1))
@@ -35,5 +35,5 @@ class Antsim:
 
 # Run the simulation
 sim = Antsim()
-sim.makeants(numants=100)
+sim.makeants(num_ants=100)
 sim.plotants()
