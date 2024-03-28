@@ -5,11 +5,6 @@ However, they retain some 'memory' of their previous infection.
 This memory gives them partial protection against reinfection, which wanes over time.
 """
 
-
-"""
-Simple agent-based SIR model in Python
-"""
-
 import numpy as np
 import sciris as sc
 import pylab as pl
@@ -19,15 +14,15 @@ import pylab as pl
 default_pars = sc.objdict(
     beta = 0.3, # Infection rate per contact per unit time
     gamma = 0.5, # Recovery rate
-    waning_half_life = 1,  # After 10 days, immunity has reduced by half
+    waning_rate = 1.0, # Rate at which immunity wanes
     n_contacts = 10, # Number of people each person is connected to
     distance = 0.1, # The distance over which people form contacts
-    I0 = 1, # Number of people initially infected
+    I0 = 3, # Number of people initially infected
     N = 1000, # Total population size
     maxtime = 40, # How long to simulate for
     npts = 100, # Number of time points during the simulation
-    seed = 3, # Random seed to use -- NB, not all seeds "take off"
-    colors = sc.dictobj(S='darkgreen', I='gold', R='skyblue'),
+    seed = 1, # Random seed to use
+    colors = sc.objdict(S='darkgreen', I='gold', R='skyblue'),
     save_movie = False, # Whether to save the movie (slow)
 )
 
@@ -57,7 +52,14 @@ class Person(sc.dictobj):
         self.I = False
         self.S = True  # They are susceptible again
         self.imm = 1  # Start with perfect immunity
+        
+    # EXERCISE: write a method "check_immunity" that updates the immunity based on exponential decay for time since infection
+    def check_immunity(self, t):
+        if self.S and self.t_I is not None:
+            self.imm = np.exp((self.t_I - t)/self.pars.waning_rate)
+        return
 
+    # EXERCISE: update check_infection to depend on the immunity parameter 
     def check_infection(self, other, t):
         pars = self.pars
         if self.S: # A person must be susceptible to be infected
@@ -70,12 +72,6 @@ class Person(sc.dictobj):
         if self.I: # A person must be infected to recover
             if np.random.rand() < pars.gamma*pars.dt: # Recovery is also probabilistic
                 self.recover(t)
-
-    def check_immunity(self, t):
-        if self.S and self.t_I is not None:
-            waning_rate = np.log(2) / self.pars.waning_half_life
-            self.imm = np.exp(-waning_rate * (t - self.t_I))
-        return
 
 
 class Sim(sc.dictobj):
@@ -143,6 +139,7 @@ class Sim(sc.dictobj):
         for person in self.people:
             person.check_recovery(t)
 
+    # EXERCISE: write a "check_immunities" method
     def check_immunities(self, t):
         """ Check how agent immunity evolves """
         for person in self.people:
