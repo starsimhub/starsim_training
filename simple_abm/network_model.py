@@ -19,11 +19,11 @@ sc.options(dpi=200)
 beta = 3 # Infection rate
 gamma = 0.5 # Recovery rate
 n_contacts = 10 # Number of people each person is connected to
-distance = 0.1 # The distance over which people form contacts
+distance = 0.01 # The distance over which people form contacts
 I0 = 1 # Number of people initially infected
 N = 100 # Total population size
-maxtime = 10 # How long to simulate for
-npts = 100 # Number of time points during the simulation
+maxtime = 4 # How long to simulate for
+npts = 40 # Number of time points during the simulation
 seed = 4 # Random seed to use
 dt = maxtime/npts # Timestep length
 colors = sc.dictobj(S='darkgreen', I='gold', R='skyblue')
