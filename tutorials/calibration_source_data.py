@@ -9,36 +9,38 @@ import pylab as pl
 
 # Set default parameters
 default_pars = sc.objdict(
-    beta = 0.2, # Infection rate per contact per unit time
+    beta = 0.15, # Infection rate per contact per unit time
     gamma = 0.1, # Recovery rate
     n_contacts = 10, # Number of people each person is connected to
     distance = 0.1, # The distance over which people form contacts
-    I0 = 1, # Number of people initially infected
-    N = 100, # Total population size
+    I0 = 5, # Number of people initially infected
+    N = 200, # Total population size
     maxtime = 20, # How long to simulate for
     dt = 0.2, # Size of the timestep
-    seed = 3495, # Random seed to use -- NB, not all seeds "take off"
+    seed = 3945, # Random seed to use -- NB, not all seeds "take off"
     colors = sc.objdict(S='darkgreen', I='gold', R='skyblue'),
     save_movie = False, # Whether to save the movie (slow)
 )
 
 
-# Define the data
+# Define the data -- from sim.I.astype(int)
 data = np.array(
-[ 1,  2,  3,  3,  4,  4,  4,  6,  6,  9,  9, 12, 14, 15, 17, 17, 16,
- 15, 15, 15, 18, 22, 27, 35, 36, 39, 40, 43, 45, 46, 48, 49, 55, 55,
- 58, 58, 58, 54, 54, 54, 55, 53, 50, 48, 45, 45, 42, 43, 42, 41, 41,
- 40, 42, 41, 40, 40, 38, 38, 39, 39, 38, 39, 39, 37, 38, 36, 37, 36,
- 34, 31, 30, 29, 28, 28, 27, 26, 26, 26, 25, 24, 23, 23, 23, 23, 23,
- 23, 23, 23, 22, 21, 20, 18, 18, 18, 18, 18, 18, 18, 19, 19]
+[ 6,  11,  14,  15,  17,  20,  25,  31,  40,  47,  52,  57,  66,
+ 75,  85,  93,  99, 100, 107, 111, 112, 118, 123, 117, 120, 122,
+122, 123, 123, 125, 122, 120, 119, 110, 112, 117, 115, 118, 117,
+113, 115, 112, 111, 107, 105, 103, 101,  99, 100,  99,  98,  97,
+ 94,  93,  92,  91,  89,  88,  88,  87,  86,  83,  81,  80,  78,
+ 76,  76,  73,  72,  71,  71,  71,  69,  68,  67,  65,  61,  58,
+ 57,  56,  56,  54,  52,  51,  51,  49,  49,  47,  46,  46,  46,
+ 46,  45,  45,  45,  43,  43,  40,  37,  36]
 )
 time = np.arange(len(data))*default_pars.dt
 
 # EXERCISE: Plot the data
-fig = pl.figure()
-pl.scatter(time, data, c='k')
-pl.xlabel('Time')
-pl.ylabel('Infections')
+# fig = pl.figure()
+# pl.scatter(time, data, c='k')
+# pl.xlabel('Time')
+# pl.ylabel('Infections')
 
 
 class Person(sc.dictobj):
