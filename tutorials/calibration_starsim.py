@@ -9,8 +9,8 @@ import pylab as pl
 
 # Set calibration parameters
 beta = 0.25
-gamma = 0.1
-seed = 4
+dur_inf = 10
+seed = 1
 
 # Define the colors
 colors = sc.objdict(S='darkgreen', I='gold', R='skyblue')
@@ -23,7 +23,7 @@ pars = sc.objdict(
     diseases = dict(
         type = 'sir',
         beta = beta,
-        dur_inf = ss.expon(scale=1/gamma),
+        dur_inf = ss.expon(scale=dur_inf),
         init_prev = 5/200,
         p_death = 0,
     ),
