@@ -82,7 +82,6 @@ class check_mismatch(ss.Analyzer):
 if __name__ == '__main__':
 
     # Create and run the simulation
-    np.random.seed(seed)
     check_mismatch = check_mismatch()
     sim = ss.Sim(pars, analyzers=check_mismatch)
     sim.run()
