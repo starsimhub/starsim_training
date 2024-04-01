@@ -7,35 +7,34 @@ import sciris as sc
 import pylab as pl
 
 # Set calibration parameters
-beta = 0.3
-gamma = 0.5
-seed = 1
+beta = 0.15
+gamma = 0.1
+seed = 3945
 
 # Set default parameters
 default_pars = sc.objdict(
     beta = beta, # Infection rate per contact per unit time
     gamma = gamma, # Recovery rate
-    n_contacts = 10, # Number of people each person is connected to
-    distance = 0.1, # The distance over which people form contacts
+    n_contacts = 5, # Number of people each person is connected to
     I0 = 5, # Number of people initially infected
     N = 200, # Total population size
     maxtime = 20, # How long to simulate for
     dt = 0.2, # Size of the timestep
-    seed = seed, # Random seed to use -- NB, not all seeds "take off"
+    seed = seed, # Random seed to use
     colors = sc.objdict(S='darkgreen', I='gold', R='skyblue'),
 )
 
 
 # Define the data -- from sim.I.astype(int)
 data = np.array(
-[ 6,  11,  14,  15,  17,  20,  25,  31,  40,  47,  52,  57,  66,
- 75,  85,  93,  99, 100, 107, 111, 112, 118, 123, 117, 120, 122,
-122, 123, 123, 125, 122, 120, 119, 110, 112, 117, 115, 118, 117,
-113, 115, 112, 111, 107, 105, 103, 101,  99, 100,  99,  98,  97,
- 94,  93,  92,  91,  89,  88,  88,  87,  86,  83,  81,  80,  78,
- 76,  76,  73,  72,  71,  71,  71,  69,  68,  67,  65,  61,  58,
- 57,  56,  56,  54,  52,  51,  51,  49,  49,  47,  46,  46,  46,
- 46,  45,  45,  45,  43,  43,  40,  37,  36]
+[ 7,  10,  16,  22,  26,  29,  35,  39,  48,  53,  59,  68,  77,
+ 85,  90,  95, 101, 107, 112, 124, 125, 129, 134, 137, 136, 135,
+136, 134, 135, 137, 140, 140, 140, 142, 141, 137, 134, 129, 128,
+126, 124, 125, 122, 118, 116, 114, 113, 109, 106, 105, 103,  99,
+ 96,  95,  92,  92,  92,  88,  88,  86,  84,  80,  80,  79,  79,
+ 76,  75,  72,  69,  68,  66,  66,  66,  66,  64,  61,  61,  61,
+ 61,  61,  60,  59,  58,  57,  57,  54,  49,  48,  47,  47,  47,
+ 47,  45,  45,  44,  44,  44,  44,  44,  41]
 )
 time = np.arange(len(data))*default_pars.dt
 
@@ -59,8 +58,6 @@ class Person(sc.dictobj):
         self.S = True # People start off susceptible
         self.I = False
         self.R = False
-        self.x = np.random.rand()
-        self.y = np.random.rand()
 
     def infect(self):
         self.S = False
@@ -116,29 +113,15 @@ class Sim(sc.dictobj):
         self.I_full = []
         self.R_full = []
 
-    def get_xy(self):
-        """ Get the location of each agent """
-        x = np.array([p.x for p in self.people])
-        y = np.array([p.y for p in self.people])
-        return x,y
-
     def make_network(self):
-        """ Create the network by pairing agents who are close to each other """
+        """ Create a random network """
         pars = self.pars
-        x,y = self.get_xy()
-        dist = np.zeros((pars.N, pars.N))
+        self.contacts = []
         for i in range(pars.N):
-            dist[i,:] = 1 + ((x - x[i])**2 + (y - y[i])**2)**0.5/self.pars.distance
-            dist[i,i] = np.inf
+            partners = np.random.randint(pars.N, size=pars.n_contacts)
+            pairs = [[i,j] for j in partners if i != j]
+            self.contacts.extend(pairs)
 
-        rnds = np.random.rand(pars.N, pars.N)
-        ratios = dist/rnds
-        order = np.argsort(ratios, axis=None)
-        inds = order[0:int(pars.N*pars.n_contacts/2)]
-        contacts = np.unravel_index(inds, ratios.shape)
-        self.contacts = np.vstack(contacts).T
-
-    # EXERCISE: write a method "check_infections" that checks for infections among pairs of people in the contacts
     def check_infections(self):
         """ Check which agents become infected """
         for p1,p2 in self.contacts:

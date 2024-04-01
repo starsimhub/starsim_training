@@ -23,13 +23,13 @@ pars = sc.objdict(
     diseases = dict(
         type = 'sir',
         beta = beta,
-        dur_inf = 1/gamma,
+        dur_inf = ss.expon(scale=1/gamma),
         init_prev = 5/200,
         p_death = 0,
     ),
     networks = dict(
         type = 'static',
-        n_contacts = 3,
+        n_contacts = 5,
     ),
     rand_seed = seed,
 )
