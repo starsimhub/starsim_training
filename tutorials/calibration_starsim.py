@@ -8,9 +8,9 @@ import starsim as ss
 import pylab as pl
 
 # Set calibration parameters
-beta = 0.2
+beta = 0.25
 gamma = 0.1
-seed = 1
+seed = 4
 
 # Define the colors
 colors = sc.objdict(S='darkgreen', I='gold', R='skyblue')
@@ -52,7 +52,8 @@ time = np.arange(len(data))*pars.dt
 class check_mismatch(ss.Analyzer):
     def finalize(self, sim):
         self.sim = sim # Used for plotting
-        self.mismatch = abs(data - sim.diseases.sir.results.new_infections[:len(data)]).mean()
+        res = sim.diseases.sir.results
+        self.mismatch = abs(data - res.n_infected[:len(data)]).mean()
     
     def plot(self):
         """ Plot numbers of S, I, R over time """
@@ -81,6 +82,7 @@ class check_mismatch(ss.Analyzer):
 if __name__ == '__main__':
 
     # Create and run the simulation
+    np.random.seed(seed)
     check_mismatch = check_mismatch()
     sim = ss.Sim(pars, analyzers=check_mismatch)
     sim.run()

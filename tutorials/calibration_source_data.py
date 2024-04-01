@@ -8,13 +8,13 @@ import pylab as pl
 
 # Set calibration parameters
 beta = 0.15
-gamma = 0.1
+dur_inf = 10
 seed = 3945
 
 # Set default parameters
 default_pars = sc.objdict(
     beta = beta, # Infection rate per contact per unit time
-    gamma = gamma, # Recovery rate
+    dur_inf = dur_inf, # Average time of infection
     n_contacts = 5, # Number of people each person is connected to
     I0 = 5, # Number of people initially infected
     N = 200, # Total population size
@@ -77,7 +77,7 @@ class Person(sc.dictobj):
     def check_recovery(self):
         pars = self.pars
         if self.I: # A person must be infected to recover
-            if np.random.rand() < pars.gamma*pars.dt: # Recovery is also probabilistic
+            if np.random.rand() < pars.dt/pars.dur_inf: # Recovery is also probabilistic
                 self.recover()
 
 
