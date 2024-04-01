@@ -1,5 +1,5 @@
 """
-Solution for tutorial 4.5 part 2
+Solution for tutorial 4.5 part 3
 """
 
 import numpy as np

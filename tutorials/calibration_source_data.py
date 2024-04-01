@@ -6,10 +6,10 @@ import numpy as np
 import sciris as sc
 import pylab as pl
 
-# Set calibration parameters
+# EXERCISE: Find parameters that match the data
 beta = 0.15
 dur_inf = 10
-seed = 3945
+seed = 1
 
 # Set default parameters
 default_pars = sc.objdict(
@@ -39,10 +39,10 @@ data = np.array(
 time = np.arange(len(data))*default_pars.dt
 
 # EXERCISE: Plot the data
-# fig = pl.figure()
-# pl.scatter(time, data, c='k')
-# pl.xlabel('Time')
-# pl.ylabel('Infections')
+fig = pl.figure()
+pl.scatter(time, data, c='k')
+pl.xlabel('Time')
+pl.ylabel('Infections')
 
 
 class Person(sc.dictobj):
