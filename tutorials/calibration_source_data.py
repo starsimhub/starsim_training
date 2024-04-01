@@ -1,25 +1,28 @@
 """
-Solution for tutorial 4.5
+Solution for tutorial 4.5 part 1
 """
 
 import numpy as np
 import sciris as sc
 import pylab as pl
 
+# Set calibration parameters
+beta = 0.3
+gamma = 0.5
+seed = 1
 
 # Set default parameters
 default_pars = sc.objdict(
-    beta = 0.15, # Infection rate per contact per unit time
-    gamma = 0.1, # Recovery rate
+    beta = beta, # Infection rate per contact per unit time
+    gamma = gamma, # Recovery rate
     n_contacts = 10, # Number of people each person is connected to
     distance = 0.1, # The distance over which people form contacts
     I0 = 5, # Number of people initially infected
     N = 200, # Total population size
     maxtime = 20, # How long to simulate for
     dt = 0.2, # Size of the timestep
-    seed = 3945, # Random seed to use -- NB, not all seeds "take off"
+    seed = seed, # Random seed to use -- NB, not all seeds "take off"
     colors = sc.objdict(S='darkgreen', I='gold', R='skyblue'),
-    save_movie = False, # Whether to save the movie (slow)
 )
 
 
@@ -169,6 +172,11 @@ class Sim(sc.dictobj):
             self.check_infections() # Check which infectious occur
             self.check_recoveries() # Check which recoveries occur
             self.count(t) # Store results
+        self.check_mismatch() # Check the mismatch at the end of the run
+    
+    # EXERCISE: define average mismatch
+    def check_mismatch(self):
+        self.mismatch = abs(data - self.I).mean()
 
     def plot(self):
         """ Plot numbers of S, I, R over time """
@@ -178,12 +186,16 @@ class Sim(sc.dictobj):
         pl.plot(self.time, self.I, label='Infected', c=cols.I)
         pl.plot(self.time, self.R, label='Recovered', c=cols.R)
         
-        # EXERCISE: plot the data
+        # EXERCISE: add the data to the plot
         pl.scatter(time, data, c='k', label='Data')
         
         pl.legend()
         pl.xlabel('Time')
         pl.ylabel('Number of people')
+        
+        # EXERCISE: add the goodness of fit/mismatch as a title to the plot
+        pl.title(f'Mismatch: {self.mismatch:n}')
+        
         pl.ylim(bottom=0)
         pl.xlim(left=0)
         pl.show()
