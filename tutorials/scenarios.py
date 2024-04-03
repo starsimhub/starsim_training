@@ -21,9 +21,16 @@ data_vaccine = np.array([
  6,  5,  3,  3,  1,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
  0,  0,  0,  0,  0])
 
+# EXERCISE: plot data
+# pl.figure()
+# pl.plot(data_baseline, label='Baseline')
+# pl.plot(data_vaccine, label='Vaccine')
+
+#%%
+
 
 class Vaccine(ss.Intervention):
-    def __init__(self, ti=10, p=0.5, boost=2.0):
+    def __init__(self, ti=5, p=0.5, boost=2.0):
         super().__init__()
         self.ti = ti
         self.p = p
@@ -79,13 +86,13 @@ def plot(results, label=''):
 
 # Make, run, and plot the simulation
 sc.options(dpi=200)
-pars = dict(beta=0.08, waning=0.03, seed=9)
+pars = dict(beta=0.08, waning=0.03, seed=7)
 res1 = make_run_sim(**pars)
 plot(res1, 'Baseline')
-res2 = make_run_sim(**pars, vaccine=True, p=0.7, boost=10)
+res2 = make_run_sim(**pars, vaccine=True, p=0.5, boost=10)
 plot(res2, 'Vaccine')
 
 # Save data
-print(res1.n_infected.astype(int))
-print(res2.n_infected.astype(int))
+print(repr(res1.n_infected.astype(int)))
+print(repr(res2.n_infected.astype(int)))
 
